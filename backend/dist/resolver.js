@@ -22,7 +22,7 @@ export const resolvers = {
             const userIndex = users.findIndex(user => user.id === id);
             if (userIndex === -1)
                 return null;
-            const [deletedUser] = users.splice(userIndex, 1);
+            const deletedUser = users.splice(userIndex, 1)[0];
             return deletedUser;
         },
     },
