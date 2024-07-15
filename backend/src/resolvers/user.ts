@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-import { User, CreateUserInput, UpdateUserInput, Context } from "./types/types";
+import { User, CreateUserInput, UpdateUserInput, Context } from "../types/types";
 
-export const resolvers = {
+export const userResolvers = {
     Query: {
         users: (_: any, __: any, { users }: Context) => users,
         user: (_: any, { id }: { id: string }, { users }: Context) => users.find(user => user.id === id),
