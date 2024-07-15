@@ -1,0 +1,26 @@
+query GetUsers {
+  users {
+    id
+    name
+    email
+  }
+}
+
+{
+  "data": {
+    "users": [
+      {
+        "id": "1",
+        "name": "Zyena Kamran",
+        "email": "zk@example.com"
+      },
+      {
+        "id": "80ec810f-0ff3-4665-911c-62ea051042b1",
+        "name": "Faizaan Talha",
+        "email": "ft@example.com"
+      }
+    ]
+  }
+}
+
+------------------------------------------------------------------
