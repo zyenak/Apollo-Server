@@ -3,16 +3,23 @@ export const typeDefs = `#graphql
     id: ID!
     name: String!
     email: String!
+    password: String!
   }
 
   input CreateUserInput {
     name: String!
     email: String!
+    password: String!
   }
 
   input UpdateUserInput {
     name: String
     email: String
+    password: String
+  }
+
+  type AuthPayload {
+    token: String!
   }
 
   type Query {
@@ -24,5 +31,6 @@ export const typeDefs = `#graphql
     createUser(input: CreateUserInput!): User
     updateUser(id: ID!, input: UpdateUserInput!): User
     deleteUser(id: ID!): User
+    loginUser(email: String!, password: String!): AuthPayload
   }
 `;

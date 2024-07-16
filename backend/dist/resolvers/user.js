@@ -1,29 +1,54 @@
-import { v4 as uuidv4 } from 'uuid';
+import { User as UserModel } from '../models/index.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 export const userResolvers = {
     Query: {
-        users: (_, __, { users }) => users,
-        user: (_, { id }, { users }) => users.find(user => user.id === id),
+        users: async (_, __, { currentUser }) => {
+            //   if (!currentUser) {
+            //     throw new Error('Not authenticated');
+            //   }
+            return await UserModel.findAll();
+        },
+        user: async (_, { id }, { currentUser }) => {
+            //   if (!currentUser) {
+            //     throw new Error('Not authenticated');
+            //   }
+            return await UserModel.findByPk(id);
+        },
     },
     Mutation: {
-        createUser: (_, { input }, { users }) => {
-            const newUser = Object.assign({ id: uuidv4() }, input);
-            users.push(newUser);
+        createUser: async (_, { input }) => {
+            const hashedPassword = await bcrypt.hash(input.password, 10);
+            const newUser = await UserModel.create(Object.assign(Object.assign({}, input), { password: hashedPassword }));
             return newUser;
         },
-        updateUser: (_, { id, input }, { users }) => {
-            const userIndex = users.findIndex(user => user.id === id);
-            if (userIndex === -1)
+        updateUser: async (_, { id, input }, { currentUser }) => {
+            if (!currentUser) {
+                throw new Error('Not authenticated');
+            }
+            const user = await UserModel.findByPk(id);
+            if (!user)
                 return null;
-            const updatedUser = Object.assign(Object.assign({}, users[userIndex]), input);
-            users[userIndex] = updatedUser;
-            return updatedUser;
+            await user.update(input);
+            return user;
         },
-        deleteUser: (_, { id }, { users }) => {
-            const userIndex = users.findIndex(user => user.id === id);
-            if (userIndex === -1)
+        deleteUser: async (_, { id }, { currentUser }) => {
+            if (!currentUser) {
+                throw new Error('Not authenticated');
+            }
+            const user = await UserModel.findByPk(id);
+            if (!user)
                 return null;
-            const deletedUser = users.splice(userIndex, 1)[0];
-            return deletedUser;
+            await user.destroy();
+            return user;
+        },
+        loginUser: async (_, { email, password }) => {
+            const user = await UserModel.findOne({ where: { email } });
+            if (!user || !(await bcrypt.compare(password, user.password))) {
+                throw new Error('Invalid credentials');
+            }
+            const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET || "JWT_SECRET", { expiresIn: '1h' });
+            return { token };
         },
     },
 };
