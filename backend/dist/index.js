@@ -18,7 +18,7 @@ const { url } = await startStandaloneServer(server, {
         let currentUser = null;
         if (token) {
             try {
-                const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+                const decodedToken = jwt.verify(token, process.env.JWT_SECRET || "JWT_SECRET");
                 const user = await UserModel.findByPk(decodedToken.userId);
                 if (user) {
                     currentUser = user.get({ plain: true });
